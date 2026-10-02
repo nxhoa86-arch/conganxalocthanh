@@ -20,9 +20,10 @@
   <nav id="nav">
     <a href="#home">Trang chủ</a>
     <a href="#ai">Trợ lý AI</a>
-    <a href="https://vpcp.dichvucong.gov.vn/p/home/dvc-trang-chu.html">Dịch vụ công</a>
+    <a href="#services">Dịch vụ công</a>
     <a href="#camera">Camera an ninh</a>
-    <a href="https://www.facebook.com/share/19oJTYgMDp/?mibextid=wwXIfr">Liên hệ</a>
+    <a href="#feedback">Phản ánh</a>
+    <a href="#contact">Liên hệ</a>
   </nav>
 </header>
 
@@ -74,37 +75,12 @@
       <button class="send" onclick="sendQuestion()">Gửi</button>
     </div>
   </div>
-	<script>
-const chat=document.getElementById("chat"),q=document.getElementById("q"),status=document.getElementById("status");
-
-function add(text,type){let d=document.createElement("div");d.className="msg "+type;d.textContent=text;chat.appendChild(d);chat.scrollTop=chat.scrollHeight}
-function ask(t){q.value=t;send()}
-
-async function send(){
- const text=q.value.trim(); if(!text)return;
- add(text,"user"); q.value=""; status.textContent="AI đang trả lời...";
- let load=document.createElement("div");load.className="msg bot";load.textContent="🤖 Đang xử lý...";chat.appendChild(load);
- try{
-   const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:text})});
-   const data=await r.json();load.remove();
-   if(!r.ok)throw new Error(data.error||"Lỗi");
-   add(data.reply,"bot");speak(data.reply);status.textContent="Sẵn sàng hỗ trợ";
- }catch(e){load.remove();add("❌ Chưa kết nối được AI. Vui lòng thử lại sau.","bot");status.textContent="Lỗi kết nối AI"}
-}
-
-function voice(){
- const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
- if(!SR){alert("Thiết bị chưa hỗ trợ nhận dạng giọng nói.");return}
- const r=new SR();r.lang="vi-VN";r.onresult=e=>{q.value=e.results[0][0].transcript;send()};r.start()
-}
-function speak(text){if(!window.speechSynthesis)return;speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(text);u.lang="vi-VN";u.rate=.95;speechSynthesis.speak(u)}
-</script>
 </section>
 
 <section id="services" class="section light">
   <div class="section-title"><span class="eyebrow">TIỆN ÍCH</span><h2>Dịch vụ và thông tin phục vụ Nhân dân</h2></div>
   <div class="cards">
-    <article><div class="icon">📋</div><h3>Dịch vụ công</h3><p>Tra cứu, hướng dẫn các thủ tục hành chính và thông tin cần thiết.</p><button onclick="https://vpcp.dichvucong.gov.vn/p/home/dvc-trang-chu.html">Truy cập</button></article>
+    <article><div class="icon">📋</div><h3>Dịch vụ công</h3><p>Tra cứu, hướng dẫn các thủ tục hành chính và thông tin cần thiết.</p><button onclick="notice('Chức năng Dịch vụ công đang được cấu hình.')">Truy cập</button></article>
     <article id="camera"><div class="icon">📹</div><h3>Camera an ninh</h3><p>Giao diện quản lý, theo dõi hệ thống camera phục vụ bảo đảm ANTT.</p><button onclick="notice('Khu vực Camera yêu cầu tài khoản được cấp quyền.')">Mở hệ thống</button></article>
     <article><div class="icon">💻</div><h3>Chuyển đổi số</h3><p>Thông tin mô hình số, ứng dụng CNTT, V3 và các sáng kiến chuyển đổi số.</p><button onclick="notice('Đang cập nhật nội dung chuyển đổi số.')">Xem thêm</button></article>
     <article id="feedback"><div class="icon">📝</div><h3>Phản ánh, kiến nghị</h3><p>Gửi phản ánh, kiến nghị để được tiếp nhận và xử lý theo quy định.</p><button onclick="openFeedback()">Gửi phản ánh</button></article>
@@ -122,8 +98,8 @@ function speak(text){if(!window.speechSynthesis)return;speechSynthesis.cancel();
 </section>
 
 <section id="contact" class="contact">
-  <div><span class="eyebrow">LIÊN HỆ</span><h2>Công an xã Lộc Thành</h2><p>Địa chỉ: Xã Lộc Thành, thành phố Đồng Nai</p><p>Điện thoại: <a href="tel:02713507007">02713507007 – Trường hợp khẩn cấp</a></p></div>
-  <div class="contact-box"><b>SẴN SÀNG HỖ TRỢ 24/7</b><p>Đường dây nóng và kênh hỗ trợ trực tuyến luôn mở để tiếp nhận kiến nghị phản ánh và hướng dẫn thủ tục liên quan đến công tác an ninh trật tự</p></div>
+  <div><span class="eyebrow">LIÊN HỆ</span><h2>Công an xã Lộc Thành</h2><p>Địa chỉ: Xã Lộc Thành, tỉnh Đồng Nai</p><p>Điện thoại: <a href="tel:113">113 – Trường hợp khẩn cấp</a></p></div>
+  <div class="contact-box"><b>Vì Nhân dân phục vụ</b><p>Website mô hình trình diễn – có thể tùy chỉnh theo nhu cầu thực tế của đơn vị.</p></div>
 </section>
 </main>
 
