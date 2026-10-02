@@ -22,7 +22,7 @@
     <a href="#ai">Trợ lý AI</a>
     <a href="#services">Dịch vụ công</a>
     <a href="#camera">Camera an ninh</a>
-    <a href="https://www.facebook.com/share/19oJTYgMDp/?mibextid=wwXIfr">Phản ánh</a>
+    <a href="#feedback">Phản ánh</a>
     <a href="#contact">Liên hệ</a>
   </nav>
 </header>
@@ -117,26 +117,16 @@
 </div>
 
 <script>
-function toggleMenu(){ document.getElementById('nav').classList.toggle('show'); }
-function notice(text){ alert(text); }
-function ask(text){ document.getElementById('question').value=text; sendQuestion(); }
-function sendQuestion(){
-  const input=document.getElementById('question'), q=input.value.trim();
-  if(!q) return;
-  const chat=document.getElementById('chat');
-  chat.innerHTML += '<div class="msg user">'+escapeHtml(q)+'</div>';
-  chat.innerHTML += '<div class="msg bot">Cảm ơn bạn. Đây là giao diện demo. Khi kết nối AI thực tế, hệ thống có thể trả lời theo dữ liệu và quy trình được đơn vị cấu hình.</div>';
-  input.value=''; chat.scrollTop=chat.scrollHeight;
-}
-function startVoice(){
-  const SpeechRecognition=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SpeechRecognition){ alert('Trình duyệt chưa hỗ trợ nhập giọng nói. Bạn có thể dùng Safari/Chrome phiên bản hỗ trợ Web Speech.'); return; }
-  const r=new SpeechRecognition(); r.lang='vi-VN'; r.start();
-  r.onresult=e=>{document.getElementById('question').value=e.results[0][0].transcript;};
-}
-function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));}
-function openFeedback(){document.getElementById('modal').classList.add('open');}
-function closeModal(e){if(!e || e.target.id==='modal' || e.target.classList.contains('close')) document.getElementById('modal').classList.remove('open');}
+function toggleMenu(){document.getElementById("nav").classList.toggle("show")}
+function notice(t){alert(t)}
+function ask(t){document.getElementById("question").value=t;sendQuestion()}
+function addMessage(t,c){const d=document.createElement("div");d.className="msg "+c;d.textContent=t;document.getElementById("chat").appendChild(d);document.getElementById("chat").scrollTop=99999}
+async function sendQuestion(){const i=document.getElementById("question"),q=i.value.trim();if(!q)return;addMessage(q,"user");i.value="";addMessage("AI đang xử lý câu hỏi...","bot");const loading=document.getElementById("chat").lastChild;try{const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:q})});const d=await r.json();loading.remove();if(!r.ok)throw Error(d.error||"Lỗi");addMessage(d.reply||"AI chưa có câu trả lời.","bot");speak(d.reply||"")}catch(e){loading.textContent="Không kết nối được máy chủ AI. Hãy kiểm tra máy chủ và API key.";console.error(e)}}
+function startVoice(){const R=window.SpeechRecognition||window.webkitSpeechRecognition;if(!R){alert("Hãy dùng Chrome hoặc Edge để nhập bằng giọng nói.");return}const r=new R();r.lang="vi-VN";r.onresult=e=>{document.getElementById("question").value=e.results[0][0].transcript;sendQuestion()};r.start()}
+function speak(t){if(!t||!speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="vi-VN";u.rate=.95;speechSynthesis.speak(u)}
+function escapeHtml(s){return s.replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]))}
+function openFeedback(){document.getElementById("modal").classList.add("open")}
+function closeModal(e){if(!e||e.target.id==="modal"||e.target.classList.contains("close"))document.getElementById("modal").classList.remove("open")}
 </script>
 </body>
 </html>
