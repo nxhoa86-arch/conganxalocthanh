@@ -10,7 +10,7 @@
 <body>
 <header class="topbar">
   <div class="brand">
-    <div class="emblem">★</div>
+    <div><img src="logo-cong-an-vector-02.jpg" width="70" height="50"></div>
     <div>
       <div class="agency">CÔNG AN XÃ LỘC THÀNH</div>
       <div class="tagline">AI – VÌ NHÂN DÂN PHỤC VỤ</div>
@@ -19,9 +19,8 @@
   <button class="menu-btn" onclick="toggleMenu()">☰</button>
   <nav id="nav">
     <a href="#home">Trang chủ</a>
-    <a href="#ai">Trợ lý AI</a>
+    <a href="https://chatgpt.com/">Trợ lý AI</a>
     <a href="https://vpcp.dichvucong.gov.vn/p/home/dvc-trang-chu.html">Dịch vụ công</a>
-    <a href="#camera">Camera an ninh</a>
     <a href="https://www.facebook.com/share/19oJTYgMDp/?mibextid=wwXIfr">Liên hệ</a>
   </nav>
 </header>
@@ -34,7 +33,7 @@
       <span class="pill">CHUYỂN ĐỔI SỐ • AI • PHỤC VỤ NHÂN DÂN</span>
       <h1>AI – VÌ NHÂN DÂN PHỤC VỤ</h1>
       <p>Công khai • Minh bạch • Nhanh chóng • Hiệu quả</p>
-      <a class="primary" href="#ai">🤖 Sử dụng Trợ lý AI</a>
+      <a class="primary" href="https://chatgpt.com/">🤖 Sử dụng Trợ lý AI</a>
     </div>
   </div>
 </section>
@@ -71,7 +70,7 @@
     <div class="input-row">
       <input id="question" placeholder="Nhập câu hỏi của bạn..." onkeydown="if(event.key==='Enter') sendQuestion()">
       <button onclick="startVoice()" title="Nhập bằng giọng nói">🎤</button>
-      <button class="send" onclick="sendQuestion()">Gửi</button>
+      <button class="send" onclick="sendQuestion()"><a href="https://chatgpt.com/">Gửi</a></button>
     </div>
   </div>
 	<script>
@@ -104,18 +103,17 @@ function speak(text){if(!window.speechSynthesis)return;speechSynthesis.cancel();
 <section id="services" class="section light">
   <div class="section-title"><span class="eyebrow">TIỆN ÍCH</span><h2>Dịch vụ và thông tin phục vụ Nhân dân</h2></div>
   <div class="cards">
-    <article><div class="icon">📋</div><h3>Dịch vụ công</h3><p>Tra cứu, hướng dẫn các thủ tục hành chính và thông tin cần thiết.</p><a href ="https://vpcp.dichvucong.gov.vn/p/home/dvc-trang-chu.html"><button style="color: white;">Truy cập</button></a></article>
+    <article><div class="icon">📋</div><h3>Dịch vụ công</h3><p>Tra cứu, hướng dẫn các thủ tục hành chính và thông tin cần thiết.</p><button style="color: white;"><a href ="https://vpcp.dichvucong.gov.vn/p/home/dvc-trang-chu.html"><font color="#F4F4F4">Truy cập</font></a></button></article>
     <article id="camera"><div class="icon">📹</div><h3>Camera an ninh</h3><p>Giao diện quản lý, theo dõi hệ thống camera phục vụ bảo đảm ANTT.</p><button onclick="notice('Khu vực Camera yêu cầu tài khoản được cấp quyền.')">Mở hệ thống</button></article>
     <article><div class="icon">💻</div><h3>Chuyển đổi số</h3><p>Thông tin mô hình số, ứng dụng CNTT, V3 và các sáng kiến chuyển đổi số.</p><button onclick="notice('Đang cập nhật nội dung chuyển đổi số.')">Xem thêm</button></article>
-    <article id="feedback"><div class="icon">📝</div><h3>Phản ánh, kiến nghị</h3><p>Gửi phản ánh, kiến nghị để được tiếp nhận và xử lý theo quy định.</p><button onclick="openFeedback()">Gửi phản ánh</button></article>
+    <article id="feedback"><div class="icon">📝</div><h3>Phản ánh, kiến nghị</h3><p>Gửi phản ánh, kiến nghị để được tiếp nhận và xử lý theo quy định.</p><button ><a href="https://m.me/CAXLOCTHANH1"><font color=#EFEFEF> Gửi phản ánh</font></a></button></article>
   </div>
 </section>
 
 <section class="section dashboard">
   <div class="section-title"><span class="eyebrow">BẢNG ĐIỀU HÀNH</span><h2>Mô hình AI – Vì Nhân dân phục vụ</h2></div>
   <div class="dash-grid">
-    <div class="dash-item"><span>🤖</span><b>Trợ lý AI</b><small>Hỏi đáp thông tin</small></div>
-    <div class="dash-item"><span>📹</span><b>Camera</b><small>Giám sát ANTT</small></div>
+    <div class="dash-item"><span>🤖</span><b><a href="https://chatgpt.com/">Trợ lý AI</a></b><small>Hỏi đáp thông tin</small></div>
     <div class="dash-item"><span>📊</span><b>Thống kê</b><small>Dữ liệu phục vụ quản lý</small></div>
     <div class="dash-item"><span>🔐</span><b>An toàn số</b><small>Bảo vệ dữ liệu</small></div>
   </div>
