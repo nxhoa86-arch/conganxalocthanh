@@ -1,0 +1,22 @@
+/* Thanh truot ngang Tin tuc va hoat dong - them vao sau style.css */
+.news-carousel{position:relative;display:flex;align-items:center;gap:8px;min-width:0;margin-top:4px}
+.news-carousel-viewport{overflow-x:auto;overflow-y:hidden;scroll-behavior:smooth;scroll-snap-type:x mandatory;scrollbar-width:none;width:100%;}
+.news-carousel-viewport::-webkit-scrollbar{display:none}
+.news-carousel-track{display:flex;gap:16px;width:max-content;}
+.news-card{flex:0 0 calc((min(1230px, 100vw - 36px) - 48px)/4);width:calc((min(1230px, 100vw - 36px) - 48px)/4);min-width:220px;background:#fff;border:1px solid #e5e5e5;border-radius:7px;overflow:hidden;box-shadow:0 3px 12px #0000000a;scroll-snap-align:start;}
+.news-card-image{display:block;height:150px;overflow:hidden;background:#eee}
+.news-card-image img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
+.news-card:hover .news-card-image img{transform:scale(1.04)}
+.news-card-body{padding:0 12px 13px}
+.news-card-body small{display:block;margin-top:10px;color:#b40016;font-size:10px;font-weight:700;line-height:1.4}
+.news-card-body h3{font-size:13px;line-height:1.45;margin:7px 0 6px;color:#222;min-height:56px}
+.news-card-body h3 a:hover{color:#b90016}
+.news-card-body p{font-size:11px;color:#777;line-height:1.5;margin:0}
+.news-carousel-arrow{flex:0 0 28px;width:28px;height:34px;border:0;border-radius:18px;background:#777;color:#fff;font-size:25px;line-height:1;cursor:pointer;z-index:2}
+.news-carousel-arrow:hover{background:#b90016}
+/* Can giua anh dai dien trong trang chi tiet bai viet */
+.article-detail-image,.article-content img,.article-body img,.news-content img,.post-content img{display:block;max-width:100%;height:auto;margin:18px auto;text-align:center;}
+.article-content,.article-body,.news-content,.post-content{line-height:1.75;}
+.article-content img,.article-body img,.news-content img,.post-content img{max-width:min(100%,900px);}
+@media(max-width:900px){.news-card{flex-basis:calc((100vw - 80px)/3);width:calc((100vw - 80px)/3);min-width:205px}}
+@media(max-width:650px){.news-carousel{gap:4px}.news-carousel-arrow{flex-basis:24px;width:24px;height:30px}.news-carousel-track{gap:10px}.news-card{flex-basis:78vw;width:78vw;min-width:0}.news-card-image{height:190px}.news-card-body h3{min-height:0}}
