@@ -1,4 +1,6 @@
 <?php
+// Buffer output so redirects can still be sent if an included PHP file has stray whitespace/BOM.
+if (!ob_get_level()) { ob_start(); }
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
