@@ -12,7 +12,7 @@ $username = getenv('DB_USER') ?: '';
 $password = getenv('DB_PASSWORD') ?: '';
 
 // Duong dan chung chi SSL Aiven
-$caFile = __DIR__ . '/certs/ca.pem';
+$caFile = __DIR__ . '/ca.pem';
 
 try {
 
