@@ -1,51 +1,38 @@
-<?php
-// Ket noi Aiven MySQL bang bien moi truong tren Render.
-// Khong ghi mat khau truc tiep vao ma nguon/GitHub.
 
-$host = getenv('AIVEN_MYSQL_HOST') ?: '';
-$port = (int)(getenv('AIVEN_MYSQL_PORT') ?: 23492);
-$dbname = getenv('AIVEN_MYSQL_DATABASE') ?: 'defaultdb';
-$username = getenv('AIVEN_MYSQL_USER') ?: 'avnadmin';
-$password = getenv('AIVEN_MYSQL_PASSWORD') ?: '';
-$caPath = __DIR__ . '/ca.pem';
+<?php
+// Ket noi Aiven MySQL cho website Cong an xa Loc Thanh
+
+$host = getenv('AIVEN_DB_HOST');
+$port = getenv('AIVEN_DB_PORT');
+$dbname = getenv('AIVEN_DB_NAME');
+$username = getenv('AIVEN_DB_USER');
+$password = getenv('AIVEN_DB_PASSWORD');
+$caPath = getenv('AIVEN_DB_CA');
 
 try {
-    if ($host === '' || $password === '') {
-        throw new RuntimeException('Missing Aiven MySQL environment variables.');
+    if (!$host || !$port || !$dbname || !$username || !$password) {
+        throw new RuntimeException('Thieu cau hinh Aiven');
     }
 
-    if (!extension_loaded('pdo_mysql')) {
-        throw new RuntimeException('PHP extension pdo_mysql is not enabled.');
+    if (!$caPath || !is_readable($caPath)) {
+        throw new RuntimeException('Khong tim thay file CA certificate');
     }
 
-    if (!is_file($caPath)) {
-        throw new RuntimeException('Aiven CA certificate ca.pem was not found.');
-    }
+    $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
 
-    $dsn = sprintf(
-        'mysql:host=%s;port=%d;dbname=%s;charset=utf8mb4',
-        $host,
-        $port,
-        $dbname
-    );
-
-    $options = [
+    $conn = new PDO($dsn, $username, $password, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES => false,
-        PDO::ATTR_TIMEOUT => 15,
         PDO::MYSQL_ATTR_SSL_CA => $caPath,
-    ];
-
-    // Verify the server certificate when this PDO build supports the option.
-    if (defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
-        $options[constant('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')] = true;
-    }
-
-    $conn = new PDO($dsn, $username, $password, $options);
+        PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => true
+    ]);
 
 } catch (Throwable $e) {
-    error_log('Aiven MySQL connection failed: ' . $e->getMessage());
-    http_response_code(500);
-    exit('Không thể kết nối cơ sở dữ liệu. Vui lòng kiểm tra cấu hình máy chủ.');
+    error_log('Aiven MySQL connection error: ' . $e->getMessage());
+    throw new RuntimeException(
+        'Khong the ket noi co so du lieu.',
+        0,
+        $e
+    );
 }
