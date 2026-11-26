@@ -440,7 +440,7 @@ function index_page_url(int $page, string $keyword, int $categoryId): string {
     <div class="masthead">
         <div class="container masthead-inner">
             <a class="identity" href="index.php" aria-label="Trang chủ Công an xã Lộc Thành">
-                <img src="assets/quoc-huy.png" alt="Quốc huy">
+                <img src="<?= h($basePrefix . 'assets/quoc-huy.png?v=20261126') ?>" alt="Quốc huy">
                 <span class="identity-text">
                     <span class="agency">CÔNG AN THÀNH PHỐ ĐỒNG NAI</span>
                     <strong>CÔNG AN XÃ LỘC THÀNH</strong>
