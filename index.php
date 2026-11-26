@@ -685,7 +685,7 @@ function index_page_url(int $page, string $keyword, int $categoryId): string {
             <h3>THÔNG TIN LIÊN HỆ</h3>
             <p>Địa chỉ: Xã Lộc Thành, thành phố Đồng Nai</p>
             <p>Điện thoại: 02713507007</p>
-            <p>Email: caxlocthanhf.gov.vn</p>
+            <p>Email: caxlocthanh.gov.vn</p>
         </div>
         <div>
             <h3>LIÊN KẾT</h3>
