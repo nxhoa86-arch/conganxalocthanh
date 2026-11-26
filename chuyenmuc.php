@@ -407,7 +407,7 @@ if ($selectedSubcategory) $pageTitle .= ' - ' . $selectedSubcategory['tenchuyenm
                     <?= h($menuName) ?>
                 </a>
             <?php endforeach; ?>
-            <a href="PhanAnh.php">GỬI PHẢN ÁNH</a>
+           
             <a href="tracuu_phananh.php">TRA CỨU</a>
             <?php if ($isAdmin): ?>
                 <span class="nav-admin-label">QUẢN TRỊ</span>
