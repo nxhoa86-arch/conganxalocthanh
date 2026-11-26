@@ -302,15 +302,55 @@ function index_page_url(int $page, string $keyword, int $categoryId): string {
       .search { display:flex; width:100%; min-width:0; }
       .search input { flex:1 1 auto; min-width:0; }
       .search button { flex:0 0 48px; }
-      .account-links { display:flex !important; flex-direction:column; align-items:flex-end; justify-content:center; gap:4px; width:100%; min-height:30px; font-size:13px; }
-       .account-main-row { display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; gap:8px; width:100%; }
-       .account-logout-row { display:block !important; width:100%; text-align:right; line-height:1.25; }
-       .account-links .logout-link {
-         display:inline-block !important; visibility:visible !important; opacity:1 !important;
-         color:#c00018 !important; font-weight:700 !important; white-space:nowrap !important;
-         text-decoration:none !important; position:relative; z-index:20;
-       }
-       .account-links .logout-link:hover { color:#8f0012 !important; text-decoration:underline !important; }
+      /* Khung tai khoan: luon hien thi dang ky/dang nhap tren cung mot hang */
+      .tools-main-row {
+        display:flex !important;
+        flex-direction:column !important;
+        align-items:stretch !important;
+        width:100% !important;
+        min-width:0 !important;
+        gap:7px !important;
+      }
+      .account-links {
+        display:flex !important;
+        flex-direction:row !important;
+        flex-wrap:wrap !important;
+        align-items:center !important;
+        justify-content:flex-end !important;
+        gap:8px !important;
+        width:100% !important;
+        min-height:30px !important;
+        font-size:13px !important;
+        overflow:visible !important;
+      }
+      .account-main-row {
+        display:flex !important;
+        flex-wrap:wrap !important;
+        justify-content:flex-end !important;
+        align-items:center !important;
+        gap:8px !important;
+        width:100% !important;
+        min-width:0 !important;
+      }
+      .account-links a.account-action,
+      .account-links a.logout-link {
+        display:inline-block !important;
+        visibility:visible !important;
+        opacity:1 !important;
+        position:relative !important;
+        z-index:30 !important;
+        color:#c00018 !important;
+        font-weight:700 !important;
+        white-space:nowrap !important;
+        text-decoration:none !important;
+        line-height:1.4 !important;
+      }
+      .account-links a.account-action:hover,
+      .account-links a.logout-link:hover {
+        color:#8f0012 !important;
+        text-decoration:underline !important;
+      }
+      .account-links .account-separator { display:inline-block !important; visibility:visible !important; }
 
       .main-nav { width:100%; }
       .nav-inner { display:flex; align-items:stretch; flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden; white-space:nowrap; scrollbar-width:thin; }
@@ -324,6 +364,7 @@ function index_page_url(int $page, string $keyword, int $categoryId): string {
       .nav-admin-label { display:flex; align-items:center; padding:0 12px; color:#ffe18b; font-weight:700; }
       @media (max-width:900px) {
         .masthead-inner { align-items:flex-start; padding-top:12px; padding-bottom:12px; flex-direction:column; gap:12px; }
+        .account-links, .account-main-row { justify-content:flex-start !important; }
         .identity { width:100%; }
         .masthead-tools { width:100%; min-width:0; }
         .utility, .account-links { justify-content:flex-start; }
@@ -427,9 +468,11 @@ function index_page_url(int $page, string $keyword, int $categoryId): string {
                             <a class="logout-link" href="DangXuat.php">Đăng xuất</a>
                         </div>
                     <?php else: ?>
-                        <a class="account-action" href="DangKy.php">Đăng ký</a>
-                        <span class="account-separator">|</span>
-                        <a class="account-action" href="DangNhap.php">Đăng nhập</a>
+                        <div class="account-main-row guest-account-row">
+                            <a class="account-action" href="DangKy.php">Đăng ký</a>
+                            <span class="account-separator" aria-hidden="true">|</span>
+                            <a class="account-action" href="DangNhap.php">Đăng nhập</a>
+                        </div>
                     <?php endif; ?>
                     </div>
                 </div>
