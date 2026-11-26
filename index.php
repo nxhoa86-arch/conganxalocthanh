@@ -325,7 +325,16 @@ function index_page_url(int $page, string $keyword, int $categoryId): string {
       .search { display:flex; width:100%; min-width:0; }
       .search input { flex:1 1 auto; min-width:0; }
       .search button { flex:0 0 48px; }
-      .account-links { display:flex; justify-content:flex-end; align-items:center; flex-wrap:wrap; gap:6px; font-size:13px; }
+      .account-links { display:flex !important; flex-direction:column; align-items:flex-end; justify-content:center; gap:4px; width:100%; min-height:30px; font-size:13px; }
+       .account-main-row { display:flex; flex-wrap:wrap; justify-content:flex-end; align-items:center; gap:8px; width:100%; }
+       .account-logout-row { display:block !important; width:100%; text-align:right; line-height:1.25; }
+       .account-links .logout-link {
+         display:inline-block !important; visibility:visible !important; opacity:1 !important;
+         color:#c00018 !important; font-weight:700 !important; white-space:nowrap !important;
+         text-decoration:none !important; position:relative; z-index:20;
+       }
+       .account-links .logout-link:hover { color:#8f0012 !important; text-decoration:underline !important; }
+
       .main-nav { width:100%; }
       .nav-inner { display:flex; align-items:stretch; flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden; white-space:nowrap; scrollbar-width:thin; }
       .nav-inner > a, .nav-inner > span { flex:0 0 auto; }
@@ -427,19 +436,25 @@ function index_page_url(int $page, string $keyword, int $categoryId): string {
                     <a href="index.php#lien-he">✉ Liên hệ</a><i aria-hidden="true"></i>
                     <a href="PhanAnh.php">☑ Góp ý</a>
                 </div>
-                <form class="search" action="index.php" method="get" role="search">
-                    <input type="search" name="q" value="<?= h($_GET['q'] ?? '') ?>" placeholder="Nhập từ khóa tìm kiếm..." aria-label="Nhập từ khóa tìm kiếm">
-                    <button type="submit" aria-label="Tìm kiếm">⌕</button>
-                </form>
-                <div class="account-links">
+                <div class="tools-main-row">
+                    <form class="search" action="index.php" method="get" role="search">
+                        <input type="search" name="q" value="<?= h($_GET['q'] ?? '') ?>" placeholder="Nhập từ khóa tìm kiếm..." aria-label="Nhập từ khóa tìm kiếm">
+                        <button type="submit" aria-label="Tìm kiếm">⌕</button>
+                    </form>
+                    <div class="account-links">
                     <?php if ($isLoggedIn): ?>
-                        <span class="hello">Xin chào, <?= h($displayName) ?></span><a class="account-action" href="doimatkhau.php">Đổi mật khẩu</a>
-                        <span class="account-separator">|</span><a class="login-link" href="<?= htmlspecialchars($basePrefix . 'DangXuat.php', ENT_QUOTES, 'UTF-8') ?>">ĐĂNG XUẤT</a>
+                        <div class="account-main-row">
+                            <span class="hello">Xin chào, <?= h($displayName) ?></span>
+                            <a class="account-action" href="doimatkhau.php">Đổi mật khẩu</a>
+                           <span class="account-separator">|</span>                  
+                            <a class="logout-link" href="DangXuat.php">Đăng xuất</a>
+                        </div>
                     <?php else: ?>
                         <a class="account-action" href="DangKy.php">Đăng ký</a>
                         <span class="account-separator">|</span>
                         <a class="account-action" href="DangNhap.php">Đăng nhập</a>
                     <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>
@@ -696,7 +711,7 @@ function index_page_url(int $page, string $keyword, int $categoryId): string {
         </div>
         <div id="sitemap">
             <h3>KẾT NỐI</h3>
-            <p>Thông tin tuyên truyền và hoạt động của đơn vị.</p>
+            <p>Thông tin tuyên truyền và hoạt động của đơn vị</p>
             <a href="#top">Trở về đầu trang ↑</a>
         </div>
     </div>
