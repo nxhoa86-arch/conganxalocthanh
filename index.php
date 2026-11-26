@@ -41,7 +41,7 @@ $activeMenu = 'home';
 $tickerText = 'Thông tin tuyên truyền và hoạt động của Công an xã Lộc Thành';
 
 // Trang chủ: 06 tin mới mỗi trang, hỗ trợ tìm kiếm và lọc danh mục
-$perPage = 6;
+$perPage = 9;
 $page = function_exists('page_value') ? page_value() : max(1, (int)($_GET['page'] ?? 1));
 $keyword = trim($_GET['q'] ?? '');
 $categoryId = (isset($_GET['danhmuc']) && ctype_digit((string)$_GET['danhmuc']))
@@ -121,9 +121,12 @@ if (isset($conn) && $conn instanceof PDO) {
         if (!$selectedCategory) $categoryId = 0;
     }
 
-    // Khu vực hoạt động hiển thị tin thuộc các danh mục ngoài 04 nhóm chọn nhanh (nếu nhận diện được).
+    // KHU VỰC TIN TỨC VÀ HOẠT ĐỘNG:
+    // Lấy tất cả tin đã đăng, không phụ thuộc cách gắn danh mục trên CSDL.
+    // Việc chọn lọc danh mục riêng vẫn được xử lý ở phần $selectedCategory bên dưới.
     $where = ["t.trangthai = 'da_dang'"];
     $params = [];
+
     if ($keyword !== '') {
         $where[] = '(t.detai LIKE :kw1 OR t.mota LIKE :kw2 OR t.motachitiet LIKE :kw3)';
         $like = '%' . $keyword . '%';
@@ -131,47 +134,20 @@ if (isset($conn) && $conn instanceof PDO) {
         $params[':kw2'] = $like;
         $params[':kw3'] = $like;
     }
-    if ($activityCategoryIds) {
-        $safeActivityIds = array_values(array_unique(array_map('intval', $activityCategoryIds)));
-        $activityIdList = implode(',', $safeActivityIds);
-        // Một số bài cũ chỉ gắn chuyên mục (machuyenmuc), chưa điền tintuc.madanhmuc.
-        // Vì vậy lấy theo cả danh mục trực tiếp và danh mục cha của chuyên mục.
-        $legacyCategoryNames = $activityCategoryNames;
-        $legacyTypePlaceholders = [];
-        $legacyIdPlaceholders = [];
-        foreach ($legacyCategoryNames as $idx => $legacyName) {
-            $typePh = ':legacy_type_' . $idx;
-            $idPh = ':legacy_id_' . $idx;
-            $legacyTypePlaceholders[] = $typePh;
-            $legacyIdPlaceholders[] = $idPh;
-            $params[$typePh] = $legacyName;
-            $params[$idPh] = $legacyName;
-        }
-        $legacySql = '';
-        if ($legacyTypePlaceholders) {
-            $inType = implode(',', $legacyTypePlaceholders);
-            $inId = implode(',', $legacyIdPlaceholders);
-            $legacySql = " OR t.theloai IN ($inType) OR t.id IN ($inId)";
-        }
-        $where[] = '(t.madanhmuc IN (' . $activityIdList . ')
-                    OR t.machuyenmuc IN (
-                        SELECT cm.machuyenmuc FROM chuyenmuc cm
-                        WHERE cm.madanhmuc IN (' . $activityIdList . ')
-                          AND cm.trang_thai = 1
-                    )' . $legacySql . ')';
-    } else {
-        // Khong tu dong hien thi nham cac danh muc khac neu CSDL chua co 3 danh muc nay.
-        $where[] = '1 = 0';
-    }
+
     $whereSql = implode(' AND ', $where);
 
+    // Đếm tổng số tin đã đăng phù hợp từ khóa tìm kiếm.
     $countStmt = $conn->prepare("SELECT COUNT(*) FROM tintuc t WHERE $whereSql");
     $countStmt->execute($params);
     $total = (int)$countStmt->fetchColumn();
+
+    // Phân trang: mặc định hiển thị 09 tin trên mỗi trang.
     $pages = max(1, (int)ceil($total / $perPage));
     $page = min($page, $pages);
     $offset = ($page - 1) * $perPage;
 
+    // Lấy danh sách tin mới nhất.
     $listSql = "SELECT t.*, d.tendanhmuc, c.tenchuyenmuc
                 FROM tintuc t
                 LEFT JOIN danhmuc d ON d.madanhmuc = t.madanhmuc
@@ -179,9 +155,10 @@ if (isset($conn) && $conn instanceof PDO) {
                 WHERE $whereSql
                 ORDER BY t.ngay DESC, t.time DESC, t.ma DESC
                 LIMIT :lim OFFSET :off";
+
     $listStmt = $conn->prepare($listSql);
     foreach ($params as $key => $value) {
-        $listStmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
+        $listStmt->bindValue($key, $value, PDO::PARAM_STR);
     }
     $listStmt->bindValue(':lim', $perPage, PDO::PARAM_INT);
     $listStmt->bindValue(':off', $offset, PDO::PARAM_INT);
@@ -325,7 +302,56 @@ function index_page_url(int $page, string $keyword, int $categoryId): string {
       .search { display:flex; width:100%; min-width:0; }
       .search input { flex:1 1 auto; min-width:0; }
       .search button { flex:0 0 48px; }
-      .account-links { display:flex; justify-content:flex-end; align-items:center; flex-wrap:wrap; gap:6px; font-size:13px; }
+      /* Khung tai khoan: luon hien thi dang ky/dang nhap tren cung mot hang */
+      .tools-main-row {
+        display:flex !important;
+        flex-direction:column !important;
+        align-items:stretch !important;
+        width:100% !important;
+        min-width:0 !important;
+        gap:7px !important;
+      }
+      .account-links {
+        display:flex !important;
+        flex-direction:row !important;
+        flex-wrap:wrap !important;
+        align-items:center !important;
+        justify-content:flex-end !important;
+        gap:8px !important;
+        width:100% !important;
+        min-height:30px !important;
+        font-size:13px !important;
+        overflow:visible !important;
+      }
+      .account-main-row {
+        display:flex !important;
+        flex-wrap:wrap !important;
+        justify-content:flex-end !important;
+        align-items:center !important;
+        gap:8px !important;
+        width:100% !important;
+        min-width:0 !important;
+      }
+      .account-links a.account-action,
+      .account-links a.logout-link {
+        display:inline-block !important;
+        visibility:visible !important;
+        opacity:1 !important;
+        position:relative !important;
+        z-index:30 !important;
+        color:#c00018 !important;
+        font-weight:700 !important;
+        white-space:nowrap !important;
+        text-decoration:none !important;
+        line-height:1.4 !important;
+      }
+      .account-links a.account-action:hover,
+      .account-links a.logout-link:hover {
+        color:#8f0012 !important;
+        text-decoration:underline !important;
+      }
+      .account-links .account-separator { display:inline-block !important; visibility:visible !important; }
+
       .main-nav { width:100%; }
       .nav-inner { display:flex; align-items:stretch; flex-wrap:nowrap; overflow-x:auto; overflow-y:hidden; white-space:nowrap; scrollbar-width:thin; }
       .nav-inner > a, .nav-inner > span { flex:0 0 auto; }
@@ -338,6 +364,7 @@ function index_page_url(int $page, string $keyword, int $categoryId): string {
       .nav-admin-label { display:flex; align-items:center; padding:0 12px; color:#ffe18b; font-weight:700; }
       @media (max-width:900px) {
         .masthead-inner { align-items:flex-start; padding-top:12px; padding-bottom:12px; flex-direction:column; gap:12px; }
+        .account-links, .account-main-row { justify-content:flex-start !important; }
         .identity { width:100%; }
         .masthead-tools { width:100%; min-width:0; }
         .utility, .account-links { justify-content:flex-start; }
@@ -427,19 +454,27 @@ function index_page_url(int $page, string $keyword, int $categoryId): string {
                     <a href="index.php#lien-he">✉ Liên hệ</a><i aria-hidden="true"></i>
                     <a href="PhanAnh.php">☑ Góp ý</a>
                 </div>
-                <form class="search" action="index.php" method="get" role="search">
-                    <input type="search" name="q" value="<?= h($_GET['q'] ?? '') ?>" placeholder="Nhập từ khóa tìm kiếm..." aria-label="Nhập từ khóa tìm kiếm">
-                    <button type="submit" aria-label="Tìm kiếm">⌕</button>
-                </form>
-                <div class="account-links">
+                <div class="tools-main-row">
+                    <form class="search" action="index.php" method="get" role="search">
+                        <input type="search" name="q" value="<?= h($_GET['q'] ?? '') ?>" placeholder="Nhập từ khóa tìm kiếm..." aria-label="Nhập từ khóa tìm kiếm">
+                        <button type="submit" aria-label="Tìm kiếm">⌕</button>
+                    </form>
+                    <div class="account-links">
                     <?php if ($isLoggedIn): ?>
-                        <span class="hello">Xin chào, <?= h($displayName) ?></span><a class="account-action" href="doimatkhau.php">Đổi mật khẩu</a>
-                        <span class="account-separator">|</span><a class="login-link" href="<?= htmlspecialchars($basePrefix . 'DangXuat.php', ENT_QUOTES, 'UTF-8') ?>">ĐĂNG XUẤT</a>
+                        <div class="account-main-row">
+                            <span class="hello">Xin chào, <?= h($displayName) ?></span>
+                            <a class="account-action" href="doimatkhau.php">Đổi mật khẩu</a>
+                           <span class="account-separator">|</span>                  
+                            <a class="logout-link" href="DangXuat.php"><font color="#0835D0">Đăng xuất</font></a>
+                        </div>
                     <?php else: ?>
-                        <a class="account-action" href="DangKy.php">Đăng ký</a>
-                        <span class="account-separator">|</span>
-                        <a class="account-action" href="DangNhap.php">Đăng nhập</a>
+                        <div class="account-main-row guest-account-row">
+                            <a class="account-action" href="DangKy.php"><font color="#0835D0"> Đăng ký</font></a>
+                            <span class="account-separator" aria-hidden="true">|</span>
+                            <a class="account-action" href="DangNhap.php"><font color="#0835D0">Đăng nhập</font></a>
+                        </div>
                     <?php endif; ?>
+                    </div>
                 </div>
             </div>
         </div>
@@ -685,7 +720,7 @@ function index_page_url(int $page, string $keyword, int $categoryId): string {
             <h3>THÔNG TIN LIÊN HỆ</h3>
             <p>Địa chỉ: Xã Lộc Thành, thành phố Đồng Nai</p>
             <p>Điện thoại: 02713507007</p>
-            <p>Email: caxlocthanhf.gov.vn</p>
+            <p>Email: caxlocthanh.gov.vn</p>
         </div>
         <div>
             <h3>LIÊN KẾT</h3>
@@ -696,7 +731,7 @@ function index_page_url(int $page, string $keyword, int $categoryId): string {
         </div>
         <div id="sitemap">
             <h3>KẾT NỐI</h3>
-            <p>Thông tin tuyên truyền và hoạt động của đơn vị.</p>
+            <p>Thông tin tuyên truyền và hoạt động của đơn vị</p>
             <a href="#top">Trở về đầu trang ↑</a>
         </div>
     </div>
