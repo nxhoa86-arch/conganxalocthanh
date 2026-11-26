@@ -465,13 +465,13 @@ function index_page_url(int $page, string $keyword, int $categoryId): string {
                             <span class="hello">Xin chào, <?= h($displayName) ?></span>
                             <a class="account-action" href="doimatkhau.php">Đổi mật khẩu</a>
                            <span class="account-separator">|</span>                  
-                            <a class="logout-link" href="DangXuat.php">Đăng xuất</a>
+                            <a class="logout-link" href="DangXuat.php"><font color="#0835D0">Đăng xuất</font></a>
                         </div>
                     <?php else: ?>
                         <div class="account-main-row guest-account-row">
-                            <a class="account-action" href="DangKy.php">Đăng ký</a>
+                            <a class="account-action" href="DangKy.php"><font color="#0835D0"> Đăng ký</font></a>
                             <span class="account-separator" aria-hidden="true">|</span>
-                            <a class="account-action" href="DangNhap.php">Đăng nhập</a>
+                            <a class="account-action" href="DangNhap.php"><font color="#0835D0">Đăng nhập</font></a>
                         </div>
                     <?php endif; ?>
                     </div>
