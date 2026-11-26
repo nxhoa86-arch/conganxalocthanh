@@ -1,38 +1,53 @@
 
 <?php
-// Ket noi Aiven MySQL cho website Cong an xa Loc Thanh
+/**
+ * KET NOI AIVEN MYSQL - WEBSITE CONG AN XA LOC THANH
+ * Su dung Environment Variables tren Render.
+ */
 
-$host = getenv('AIVEN_DB_HOST');
-$port = getenv('AIVEN_DB_PORT');
-$dbname = getenv('AIVEN_DB_NAME');
-$username = getenv('AIVEN_DB_USER');
-$password = getenv('AIVEN_DB_PASSWORD');
-$caPath = getenv('AIVEN_DB_CA');
+$host     = getenv('DB_HOST');
+$dbname   = getenv('DB_NAME');
+$username = getenv('DB_USER');
+$password = getenv('DB_PASSWORD');
+$port     = getenv('DB_PORT');
+
+// Kiem tra cau hinh
+if (!$host || !$dbname || !$username || !$password || !$port) {
+    error_log('Aiven: Thieu bien moi truong ket noi CSDL.');
+    http_response_code(500);
+    exit('Thieu cau hinh ket noi co so du lieu.');
+}
+
+// Duong dan chung chi SSL
+$caFile = __DIR__ . '/ca.pem';
+
+if (!file_exists($caFile)) {
+    error_log('Aiven: Khong tim thay ca.pem tai ' . $caFile);
+    http_response_code(500);
+    exit('Khong tim thay chung chi SSL cua may chu.');
+}
 
 try {
-    if (!$host || !$port || !$dbname || !$username || !$password) {
-        throw new RuntimeException('Thieu cau hinh Aiven');
-    }
+    // Cau hinh PDO
+    $options = [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES => false,
+        PDO::ATTR_TIMEOUT => 15,
+        PDO::MYSQL_ATTR_SSL_CA => $caFile
+    ];
 
-    if (!$caPath || !is_readable($caPath)) {
-        throw new RuntimeException('Khong tim thay file CA certificate');
+    // Xac minh chung chi may chu neu PHP ho tro
+    if (defined('PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT')) {
+        $options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = true;
     }
 
     $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
 
-    $conn = new PDO($dsn, $username, $password, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-        PDO::ATTR_EMULATE_PREPARES => false,
-        PDO::MYSQL_ATTR_SSL_CA => $caPath,
-        PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => true
-    ]);
+    $conn = new PDO($dsn, $username, $password, $options);
 
-} catch (Throwable $e) {
+} catch (PDOException $e) {
     error_log('Aiven MySQL connection error: ' . $e->getMessage());
-    throw new RuntimeException(
-        'Khong the ket noi co so du lieu.',
-        0,
-        $e
-    );
+    http_response_code(500);
+    exit('Khong the ket noi co so du lieu. Vui long kiem tra cau hinh may chu.');
 }
