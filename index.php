@@ -41,7 +41,7 @@ $activeMenu = 'home';
 $tickerText = 'Thông tin tuyên truyền và hoạt động của Công an xã Lộc Thành';
 
 // Trang chủ: 06 tin mới mỗi trang, hỗ trợ tìm kiếm và lọc danh mục
-$perPage = 6;
+$perPage = 9;
 $page = function_exists('page_value') ? page_value() : max(1, (int)($_GET['page'] ?? 1));
 $keyword = trim($_GET['q'] ?? '');
 $categoryId = (isset($_GET['danhmuc']) && ctype_digit((string)$_GET['danhmuc']))
@@ -121,9 +121,12 @@ if (isset($conn) && $conn instanceof PDO) {
         if (!$selectedCategory) $categoryId = 0;
     }
 
-    // Khu vực hoạt động hiển thị tin thuộc các danh mục ngoài 04 nhóm chọn nhanh (nếu nhận diện được).
+    // KHU VỰC TIN TỨC VÀ HOẠT ĐỘNG:
+    // Lấy tất cả tin đã đăng, không phụ thuộc cách gắn danh mục trên CSDL.
+    // Việc chọn lọc danh mục riêng vẫn được xử lý ở phần $selectedCategory bên dưới.
     $where = ["t.trangthai = 'da_dang'"];
     $params = [];
+
     if ($keyword !== '') {
         $where[] = '(t.detai LIKE :kw1 OR t.mota LIKE :kw2 OR t.motachitiet LIKE :kw3)';
         $like = '%' . $keyword . '%';
@@ -131,47 +134,20 @@ if (isset($conn) && $conn instanceof PDO) {
         $params[':kw2'] = $like;
         $params[':kw3'] = $like;
     }
-    if ($activityCategoryIds) {
-        $safeActivityIds = array_values(array_unique(array_map('intval', $activityCategoryIds)));
-        $activityIdList = implode(',', $safeActivityIds);
-        // Một số bài cũ chỉ gắn chuyên mục (machuyenmuc), chưa điền tintuc.madanhmuc.
-        // Vì vậy lấy theo cả danh mục trực tiếp và danh mục cha của chuyên mục.
-        $legacyCategoryNames = $activityCategoryNames;
-        $legacyTypePlaceholders = [];
-        $legacyIdPlaceholders = [];
-        foreach ($legacyCategoryNames as $idx => $legacyName) {
-            $typePh = ':legacy_type_' . $idx;
-            $idPh = ':legacy_id_' . $idx;
-            $legacyTypePlaceholders[] = $typePh;
-            $legacyIdPlaceholders[] = $idPh;
-            $params[$typePh] = $legacyName;
-            $params[$idPh] = $legacyName;
-        }
-        $legacySql = '';
-        if ($legacyTypePlaceholders) {
-            $inType = implode(',', $legacyTypePlaceholders);
-            $inId = implode(',', $legacyIdPlaceholders);
-            $legacySql = " OR t.theloai IN ($inType) OR t.id IN ($inId)";
-        }
-        $where[] = '(t.madanhmuc IN (' . $activityIdList . ')
-                    OR t.machuyenmuc IN (
-                        SELECT cm.machuyenmuc FROM chuyenmuc cm
-                        WHERE cm.madanhmuc IN (' . $activityIdList . ')
-                          AND cm.trang_thai = 1
-                    )' . $legacySql . ')';
-    } else {
-        // Khong tu dong hien thi nham cac danh muc khac neu CSDL chua co 3 danh muc nay.
-        $where[] = '1 = 0';
-    }
+
     $whereSql = implode(' AND ', $where);
 
+    // Đếm tổng số tin đã đăng phù hợp từ khóa tìm kiếm.
     $countStmt = $conn->prepare("SELECT COUNT(*) FROM tintuc t WHERE $whereSql");
     $countStmt->execute($params);
     $total = (int)$countStmt->fetchColumn();
+
+    // Phân trang: mặc định hiển thị 09 tin trên mỗi trang.
     $pages = max(1, (int)ceil($total / $perPage));
     $page = min($page, $pages);
     $offset = ($page - 1) * $perPage;
 
+    // Lấy danh sách tin mới nhất.
     $listSql = "SELECT t.*, d.tendanhmuc, c.tenchuyenmuc
                 FROM tintuc t
                 LEFT JOIN danhmuc d ON d.madanhmuc = t.madanhmuc
@@ -179,9 +155,10 @@ if (isset($conn) && $conn instanceof PDO) {
                 WHERE $whereSql
                 ORDER BY t.ngay DESC, t.time DESC, t.ma DESC
                 LIMIT :lim OFFSET :off";
+
     $listStmt = $conn->prepare($listSql);
     foreach ($params as $key => $value) {
-        $listStmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
+        $listStmt->bindValue($key, $value, PDO::PARAM_STR);
     }
     $listStmt->bindValue(':lim', $perPage, PDO::PARAM_INT);
     $listStmt->bindValue(':off', $offset, PDO::PARAM_INT);
